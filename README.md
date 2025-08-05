@@ -101,8 +101,8 @@ chmod +x build.sh deploy.sh init.sh
 
 ### 4. Access the Application
 
-- **KumbiaPHP Application**: http://localhost:8080
-- **phpMyAdmin**: http://localhost:8081
+- **KumbiaPHP Application**: http://localhost:8180
+- **phpMyAdmin**: http://localhost:8182
 
 ## Useful Commands
 
