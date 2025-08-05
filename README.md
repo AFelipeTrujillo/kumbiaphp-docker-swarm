@@ -250,19 +250,40 @@ Edit `config.env` or use parameters in `build.sh`:
 
 ## 📚 Development
 
-### KumbiaPHP Application Structure
+### KumbiaPHP Project Structure
 
 ```
-app/
-├── controllers/
-│   └── index_controller.php   # Main controller
-├── models/                    # Data models
-├── views/
-│   └── index/
-│       ├── index.phtml        # Main view
-│       └── test.phtml         # Test view
-└── config/
-    └── databases.php          # DB configuration (auto-generated)
+app/                           # Complete KumbiaPHP Framework Project
+├── core/                      # KumbiaPHP Framework Core
+│   ├── kumbia/               # Core framework components
+│   ├── libs/                 # Core libraries
+│   ├── views/                # Core views and layouts
+│   ├── extensions/           # Framework extensions
+│   ├── console/              # Command line tools
+│   └── tests/                # Core tests
+├── default/                   # Default KumbiaPHP Application
+│   ├── index.php             # Entry point
+│   ├── public/               # Public assets (CSS, JS, images)
+│   └── app/                  # Application code
+│       ├── controllers/      # Application controllers
+│       ├── models/           # Data models
+│       ├── views/            # Application views
+│       ├── config/           # Configuration files
+│       ├── libs/             # Application libraries
+│       ├── locale/           # Internationalization
+│       ├── temp/             # Temporary files
+│       ├── tests/            # Application tests
+│       ├── extensions/       # Custom extensions
+│       └── bin/              # Executable scripts
+├── vendor/                    # Composer dependencies
+├── .git/                      # Git repository
+├── composer.json             # Composer configuration
+├── .gitignore               # Git ignore rules
+├── .htaccess                # Apache configuration
+├── .travis.yml              # CI/CD configuration
+├── .phpmd.xml               # PHP Mess Detector config
+├── README.md                # Project documentation
+└── LICENSE                  # License file
 ```
 
 ### Local Development
