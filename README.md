@@ -66,7 +66,7 @@ REPLICAS=3  # Number of application replicas
 ### 1. Clone the Project
 
 ```bash
-git clone <your-repo>
+git clone https://github.com/AFelipeTrujillo/kumbiaphp-docker-swarm
 cd kumbiakumbiaphp-docker-swarm
 ```
 
