@@ -158,13 +158,8 @@ The system automatically configures:
 ### Example Table
 
 ```sql
-users (
-    id, username, email, password, 
-    created_at, updated_at
-)
+users (id, username, email, password, created_at, updated_at)
 ```
-
-Initial user: admin / admin@example.com
 
 ## Customization
 
