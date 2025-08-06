@@ -59,7 +59,22 @@ echo "Setting up file permissions..."
 chown -R www-data:www-data /var/www/html
 chmod -R 755 /var/www/html
 
-echo "Configuration completed. Starting Apache..."
+echo "Configuration completed. Starting web server..."
 
-# Start Apache in foreground
-apache2-foreground 
+# Start web server based on WEBSERVER environment variable
+if [ "$WEBSERVER" = "nginx" ]; then
+    echo "Starting Nginx with PHP-FPM..."
+    # Remove default nginx site and enable our configuration
+    rm -f /etc/nginx/sites-enabled/default
+    ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+    
+    # Test nginx configuration
+    nginx -t
+    
+    # Start supervisor (nginx + php-fpm)
+    /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+else
+    echo "Starting Apache..."
+    # Start Apache in foreground
+    apache2-foreground
+fi 

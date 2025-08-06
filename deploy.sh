@@ -71,6 +71,7 @@ deploy() {
     echo "   - KumbiaPHP: $KUMBIAPHP_VERSION"
     echo "   - MySQL: $MYSQL_VERSION"
     echo "   - PHP: $PHP_VERSION"
+    echo "   - Web Server: $WEBSERVER"
     echo "   - Replicas: $REPLICAS"
     echo "   - Application Port: $APP_PORT"
     echo "   - MySQL Port: $MYSQL_PORT"

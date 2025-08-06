@@ -5,6 +5,7 @@ KumbiaPHP project containerized with Docker Swarm, MySQL and configurable versio
 ## Features
 
 - **KumbiaPHP**: PHP MVC framework with configurable version
+- **Web Server Choice**: Apache or Nginx with PHP-FPM configurable
 - **MySQL**: Database with configurable version  
 - **Docker Swarm**: Orchestration with high availability
 - **phpMyAdmin**: Web interface to manage MySQL
@@ -20,6 +21,8 @@ kumbia/
 ├── docker-compose.yml         # Docker Swarm configuration
 ├── config.env                 # Configuration variables
 ├── apache-config.conf         # Apache configuration
+├── nginx-config.conf          # Nginx configuration
+├── supervisord.conf           # Supervisor configuration for Nginx+PHP-FPM
 ├── init.sh                    # Container initialization script
 ├── build.sh                   # Script to build the application
 ├── deploy.sh                  # Script to deploy on Swarm
@@ -38,6 +41,7 @@ kumbia/
 KUMBIAPHP_VERSION=1.2.1 # KumbiaPHP version (1.0, beta2, master)
 MYSQL_VERSION=8.0       # MySQL version (8.0, 5.7, etc.)
 PHP_VERSION=8.4.1       # PHP version (8.1, 8.0, 7.4, etc.)
+WEBSERVER=apache        # Web server: apache or nginx
 
 # Database
 MYSQL_ROOT_PASSWORD=kumbia_root_pass
@@ -80,7 +84,13 @@ chmod +x build.sh deploy.sh init.sh
 ./build.sh
 
 # Specify versions
-./build.sh -k v1.2.1 -m 8.0 -p 8.4.1
+./build.sh -k v1.2.1 -m 8.0 -p 8.4.1 -w apache
+
+# Use Nginx instead of Apache
+./build.sh -w nginx
+
+# Combine options
+./build.sh -k v1.2.1 -w nginx -p 8.4.1 -m 8.0
 
 # Rebuild without cache
 ./build.sh --no-cache
@@ -111,6 +121,8 @@ chmod +x build.sh deploy.sh init.sh
 ```bash
 ./build.sh --help                    # View help
 ./build.sh -k 1.0 -m 8.0 -p 8.1     # Specific versions
+./build.sh -w nginx                  # Use Nginx web server
+./build.sh -w apache                 # Use Apache web server (default)
 ./build.sh --no-cache                # Build without cache
 ```
 
@@ -196,7 +208,7 @@ Edit `config.env` or use parameters in `build.sh`:
 
 ### Services
 
-1. **kumbia-app**: PHP application with Apache
+1. **kumbia-app**: PHP application with Apache or Nginx (configurable)
 2. **mysql**: MySQL database
 3. **phpmyadmin**: Web interface for MySQL
 
