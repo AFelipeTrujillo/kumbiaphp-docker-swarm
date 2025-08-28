@@ -12,6 +12,7 @@ FROM ${WEBSERVER}-base as final
 # Arguments for KumbiaPHP version
 ARG KUMBIAPHP_VERSION=1.0
 ARG WEBSERVER=apache
+ARG MEMCACHED_VERSION=""
 
 # Install system dependencies (common for both servers)
 RUN apt-get update && apt-get install -y \
@@ -24,6 +25,8 @@ RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
     libonig-dev \
     libxml2-dev \
+    zlib1g-dev \
+    pkg-config \
     mariadb-client \
     supervisor \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
@@ -37,6 +40,15 @@ RUN apt-get update && apt-get install -y \
         bcmath \
         gd \
         zip
+
+# Install Memcached dependencies and extension if version is specified
+RUN if [ -n "$MEMCACHED_VERSION" ]; then \
+        apt-get install -y libmemcached-dev libmemcached11 libmemcachedutil2 libssl-dev \
+        && yes '' | pecl install memcached-3.2.0 \
+        && docker-php-ext-enable memcached \
+        && echo "session.save_handler = memcached" >> /usr/local/etc/php/php.ini \
+        && echo "session.save_path = \"memcached:11211\"" >> /usr/local/etc/php/php.ini; \
+    fi
 
 # Install Nginx for nginx variant
 RUN if [ "$WEBSERVER" = "nginx" ]; then \

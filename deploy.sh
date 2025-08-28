@@ -22,7 +22,7 @@ show_help() {
     echo "  --init                 Initialize Docker Swarm (first time only)"
     echo "  --update               Update existing services"
     echo "  --remove               Remove complete stack"
-    echo "  --logs [service]       Show logs (kumbia-app, mysql, phpmyadmin)"
+    echo "  --logs [service]       Show logs (kumbia-app, mysql, phpmyadmin, memcached)"
     echo "  --status               Show services status"
     echo "  -h, --help             Show this help"
     echo ""
@@ -72,6 +72,12 @@ deploy() {
     echo "   - MySQL: $MYSQL_VERSION"
     echo "   - PHP: $PHP_VERSION"
     echo "   - Web Server: $WEBSERVER"
+    if [ -n "$MEMCACHED_VERSION" ]; then
+        echo "   - Memcached: $MEMCACHED_VERSION"
+        echo "   - Memcached Port: $MEMCACHED_PORT"
+    else
+        echo "   - Memcached: Disabled"
+    fi
     echo "   - Replicas: $REPLICAS"
     echo "   - Application Port: $APP_PORT"
     echo "   - MySQL Port: $MYSQL_PORT"
@@ -82,14 +88,25 @@ deploy() {
     echo "   APP_PORT exported: $(printenv APP_PORT)"
     echo "   PHPMYADMIN_PORT exported: $(printenv PHPMYADMIN_PORT)"
     
-    # Deploy stack
-    docker stack deploy -c docker-compose.yml kumbia-stack
+    # Generate compose file based on configuration
+    if [ -n "$MEMCACHED_VERSION" ]; then
+        echo "Deploying with Memcached enabled..."
+        # Use the complete docker-compose.yml (includes memcached)
+        docker stack deploy -c docker-compose.yml kumbia-stack
+    else
+        echo "Deploying without Memcached..."
+        # Use the base compose without memcached
+        docker stack deploy -c docker-compose.base.yml kumbia-stack
+    fi
     
     echo "Application deployed!"
     echo ""
     echo "Available URLs:"
     echo "   - Application: http://localhost:$APP_PORT"
     echo "   - phpMyAdmin: http://localhost:$PHPMYADMIN_PORT"
+    if [ -n "$MEMCACHED_VERSION" ]; then
+        echo "   - Memcached: localhost:$MEMCACHED_PORT"
+    fi
     echo ""
     echo "To view status: ./deploy.sh --status"
     echo "To view logs: ./deploy.sh --logs"
@@ -120,6 +137,11 @@ show_logs() {
         echo ""
         echo "=== Logs from phpmyadmin ==="
         docker service logs kumbia-stack_phpmyadmin --tail 50
+        if [ -n "$MEMCACHED_VERSION" ]; then
+            echo ""
+            echo "=== Logs from memcached ==="
+            docker service logs kumbia-stack_memcached --tail 50
+        fi
     else
         echo "Logs from $service:"
         docker service logs kumbia-stack_$service --tail 100 --follow

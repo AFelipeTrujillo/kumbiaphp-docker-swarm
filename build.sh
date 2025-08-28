@@ -20,6 +20,7 @@ show_help() {
     echo "  -m, --mysql-version VERSION       MySQL version (default: $MYSQL_VERSION)"
     echo "  -p, --php-version VERSION         PHP version (default: $PHP_VERSION)"
     echo "  -w, --webserver TYPE              Web server type: apache|nginx (default: $WEBSERVER)"
+    echo "  -mc, --memcached VERSION          Memcached version (default: disabled)"
     echo "  -r, --replicas NUMBER             Number of replicas (default: $REPLICAS)"
     echo "  --no-cache                        Build without cache"
     echo "  -h, --help                        Show this help"
@@ -28,6 +29,7 @@ show_help() {
     echo "  ./build.sh                                    # Use default values"
     echo "  ./build.sh -k v1.2.1 -m 8.0 -p 8.2           # Specific versions"
     echo "  ./build.sh -w nginx -p 8.2                   # Use Nginx with PHP 8.2"
+    echo "  ./build.sh -mc 1.6.21                        # Enable Memcached with specific version"
     echo "  ./build.sh --no-cache                        # Rebuild from scratch"
 }
 
@@ -36,6 +38,7 @@ KUMBIAPHP_VERSION=${KUMBIAPHP_VERSION:-1.2.1}
 MYSQL_VERSION=${MYSQL_VERSION:-8.0}
 PHP_VERSION=${PHP_VERSION:-8.4.1}
 WEBSERVER=${WEBSERVER:-apache}
+MEMCACHED_VERSION=${MEMCACHED_VERSION:-}
 REPLICAS=${REPLICAS:-3}
 NO_CACHE=""
 
@@ -60,6 +63,10 @@ while [[ $# -gt 0 ]]; do
                 echo "Error: Web server must be 'apache' or 'nginx'"
                 exit 1
             fi
+            shift 2
+            ;;
+        -mc|--memcached)
+            MEMCACHED_VERSION="$2"
             shift 2
             ;;
         -r|--replicas)
@@ -87,6 +94,11 @@ echo "KumbiaPHP Version: $KUMBIAPHP_VERSION"
 echo "MySQL Version: $MYSQL_VERSION"
 echo "PHP Version: $PHP_VERSION"
 echo "Web Server: $WEBSERVER"
+if [ -n "$MEMCACHED_VERSION" ]; then
+    echo "Memcached Version: $MEMCACHED_VERSION"
+else
+    echo "Memcached: Disabled"
+fi
 echo "Replicas: $REPLICAS"
 
 # Create necessary directories for bind mounts
@@ -107,6 +119,7 @@ KUMBIAPHP_VERSION=$KUMBIAPHP_VERSION
 MYSQL_VERSION=$MYSQL_VERSION
 PHP_VERSION=$PHP_VERSION
 WEBSERVER=$WEBSERVER
+MEMCACHED_VERSION=$MEMCACHED_VERSION
 
 # Database configuration
 MYSQL_ROOT_PASSWORD=kumbia_root_pass
@@ -119,6 +132,7 @@ APP_NAME=kumbia-app
 APP_PORT=8180
 MYSQL_PORT=8181
 PHPMYADMIN_PORT=8182
+MEMCACHED_PORT=8183
 
 # Docker Swarm configuration
 REPLICAS=$REPLICAS
@@ -131,6 +145,7 @@ docker build $NO_CACHE \
     --build-arg PHP_VERSION=$PHP_VERSION \
     --build-arg KUMBIAPHP_VERSION=$KUMBIAPHP_VERSION \
     --build-arg WEBSERVER=$WEBSERVER \
+    --build-arg MEMCACHED_VERSION="$MEMCACHED_VERSION" \
     -t kumbia-app:latest .
 
 echo "Build completed!"
